@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CurrencyController } from './currency/currency.controller';
-import { CurrencyService } from './currency/currency.service';
+import { MongooseModule } from '@nestjs/mongoose';
 import { CurrencyModule } from './currency/currency.module';
 
 @Module({
-  imports: [CurrencyModule],
-  controllers: [AppController, CurrencyController],
-  providers: [AppService, CurrencyService],
+  imports: [CurrencyModule, MongooseModule.forRoot('mongodb://localhost:27017/ExchangeCurrency')],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

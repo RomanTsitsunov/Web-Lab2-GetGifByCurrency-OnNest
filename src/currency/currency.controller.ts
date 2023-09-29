@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Redirect } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { CurrencyService } from './currency.service';
 
 @Controller('currency')

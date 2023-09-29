@@ -1,10 +1,15 @@
 import { Injectable, Redirect } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
-import e from 'express';
-import { connected } from 'process';
+import { Currency } from './schemas/currency.schema';
+import { Model } from 'mongoose';
+import { CreateCurrencyDto } from './dto/create-currency.dto';
 
 @Injectable()
 export class CurrencyService {
+    constructor(@InjectModel(Currency.name) private currencyModel: Model<Currency>) {
+
+    }
 
     async getGifByCurrency() {
         let todayCurrency = await this.getCurrency("today");
@@ -36,7 +41,6 @@ export class CurrencyService {
             }
         }
         let rate: number;
-        const axios = require('axios');
         let data = new Date();
         let year = data.getFullYear();
         let month = ("0" + (data.getMonth() + 1)).slice(-2);
@@ -53,12 +57,12 @@ export class CurrencyService {
         + date + '.json?app_id=b30155599cff472eaa00b6e9aec46345&base=USD&symbols=RUB')
         rate = response.data.rates.RUB;
         console.log(rate);
+        this.saveCurrency("USD", "RUB", rate, date);
         return rate;
     }
 
     async getGif(tag: string) {
         let url: string;
-        const axios = require("axios");
         let response = await axios.get('https://api.giphy.com/v1/gifs/search' +
         '?api_key=8aY0SXbrmak3bMXIPUuALNu6t4OMKCuD&q=' + tag);
         let rand = Math.floor((Math.random() * 50));
@@ -66,4 +70,16 @@ export class CurrencyService {
         console.log(url);
         return url;
     }
+
+    async saveCurrency(base, target, rate, date) {
+        const createCurrencyDto = new CreateCurrencyDto();
+        createCurrencyDto.base="USD";
+        createCurrencyDto.target="RUB";
+        createCurrencyDto.values=rate;
+        createCurrencyDto.date=date;
+
+        const currency = new this.currencyModel(createCurrencyDto);
+        return currency.save();
+    }
+
 }
