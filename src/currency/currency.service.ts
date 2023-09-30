@@ -53,18 +53,25 @@ export class CurrencyService {
             day = ("0" + (data.getDate() - 1)).slice(-2);
         }
         let date = year + "-" + month + "-" + day;
-        let response = await axios.get('https://openexchangerates.org/api/historical/'
-        + date + '.json?app_id=b30155599cff472eaa00b6e9aec46345&base=USD&symbols=RUB')
+        let response = await axios.get(
+            `${process.env.CURRENCY_URL}` + date + `.json?` +
+            `app_id=${process.env.CURRENCY_APP_ID}&` +
+            `base=${process.env.CURRENCY_BASE}&` +
+            `symbols=${process.env.CURRENCY_SYMBOLS}`);
         rate = response.data.rates.RUB;
         console.log(rate);
-        this.saveCurrency("USD", "RUB", rate, date);
+        this.saveCurrency(
+            `${process.env.CURRENCY_BASE}`,
+            `${process.env.CURRENCY_SYMBOLS}`,
+            rate, date);
         return rate;
     }
 
     async getGif(tag: string) {
         let url: string;
-        let response = await axios.get('https://api.giphy.com/v1/gifs/search' +
-        '?api_key=8aY0SXbrmak3bMXIPUuALNu6t4OMKCuD&q=' + tag);
+        let response = await axios.get(
+            `${process.env.GITHY_URL}?` +
+            `api_key=${process.env.GITHY_API_KEY}&q=` + tag);
         let rand = Math.floor((Math.random() * 50));
         url = response.data.data[rand].url;
         console.log(url);
@@ -73,8 +80,8 @@ export class CurrencyService {
 
     async saveCurrency(base, target, rate, date) {
         const createCurrencyDto = new CreateCurrencyDto();
-        createCurrencyDto.base="USD";
-        createCurrencyDto.target="RUB";
+        createCurrencyDto.base=base;
+        createCurrencyDto.target=target;
         createCurrencyDto.values=rate;
         createCurrencyDto.date=date;
 
